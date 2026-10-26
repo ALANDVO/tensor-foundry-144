@@ -1,2 +1,6 @@
-# tensor-foundry-144
-Alan Vo | Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.
+# tensor-foundry-144 — Alan Vo
+
+> Work in progress. This checkpoint may be incomplete or fail tests. See PLAN.md and STATUS.md before use.
+
+
+Maintainer: Alan Vo <alanvo@gmail.com>

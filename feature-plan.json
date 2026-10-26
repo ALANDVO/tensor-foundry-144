@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "current_feature": "core-skeleton",
+  "features": [
+    {
+      "id": "core-skeleton",
+      "title": "Core FastAPI/React skeleton with one end-to-end workflow",
+      "status": "in_progress",
+      "acceptance": [
+        "FastAPI backend runs and serves API",
+        "React frontend builds and loads",
+        "Single end-to-end workflow works (e.g., health check or simple API call)",
+        "Install instructions documented",
+        "Basic tests pass"
+      ],
+      "implementation": [
+        "backend/main.py",
+        "backend/requirements.txt",
+        "frontend/package.json",
+        "frontend/src/App.tsx",
+        "frontend/src/main.tsx",
+        "frontend/index.html",
+        "frontend/vite.config.ts",
+        "README.md",
+        "PLAN.md"
+      ],
+      "tests": [
+        "backend/tests/test_health.py",
+        "frontend/src/App.test.tsx"
+      ]
+    },
+    {
+      "id": "ponytail-config",
+      "title": "Ponytail configuration system (modes, settings, persistence)",
+      "status": "planned",
+      "acceptance": [
+        "Configuration file read/write",
+        "Mode switching (lite, standard, ultra, off)",
+        "Environment variable overrides",
+        "Settings persisted across sessions"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "hooks-system",
+      "title": "Hooks system for AI agent integration",
+      "status": "planned",
+      "acceptance": [
+        "SessionStart hook injects context",
+        "UserPromptSubmit hook tracks prompts",
+        "PreToolUse/PostToolUse hooks for tool tracking",
+        "Hook output format compatible with Claude Code, Copilot, etc."
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "band-statusline",
+      "title": "Band statusline UI (compact/detailed modes)",
+      "status": "planned",
+      "acceptance": [
+        "Compact single-line display",
+        "Detailed multi-line display",
+        "Mode indicator, cost, time, review/audit/board buttons",
+        "Desktop app layout fix (no unwanted wrapping)"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "codebase-map",
+      "title": "Codebase map injection at session start",
+      "status": "planned",
+      "acceptance": [
+        "Generates repository map on SessionStart",
+        "Configurable size via PONYTAIL_MAP_CHARS",
+        "Can be disabled via PONYTAIL_MAP=0",
+        "Works with Claude Code, Codex, Copilot CLI, Cursor"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "gitattributes-ci",
+      "title": "Git attributes and cross-platform CI",
+      "status": "planned",
+      "acceptance": [
+        ".gitattributes with LF enforcement",
+        "CI matrix for ubuntu-latest and windows-latest",
+        "Tests pass on both platforms"
+      ],
+      "implementation": [],
+      "tests": []
+    }
+  ]
+}
