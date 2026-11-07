@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
 import App from "./App"
 
-// Mock fetch globally
-global.fetch = vi.fn()
+const fetchMock = vi.fn()
+globalThis.fetch = fetchMock
 
 describe("App", () => {
   beforeEach(() => {
@@ -11,7 +11,7 @@ describe("App", () => {
   })
 
   it("renders loading state initially", () => {
-    ;(fetch as any).mockImplementation(() => new Promise(() => {})) // never resolves
+    fetchMock.mockImplementation(() => new Promise(() => {}))
 
     render(<App />)
     expect(screen.getByText("Loading...")).toBeInTheDocument()
@@ -36,7 +36,7 @@ describe("App", () => {
       },
     }
 
-    ;(fetch as any)
+    fetchMock
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockHealth) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockConfig) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockModes) })
@@ -49,13 +49,16 @@ describe("App", () => {
       expect(screen.getByText("Mode Selector")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("ok")).toBeInTheDocument()
-    expect(screen.getByText("tensor-foundry-144")).toBeInTheDocument()
-    expect(screen.getByText("standard")).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /off/i })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: /lite/i })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: /standard/i })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: /ultra/i })).toBeInTheDocument()
+    })
   })
 
   it("renders error when fetch fails", async () => {
-    ;(fetch as any).mockRejectedValue(new Error("Network error"))
+    fetchMock.mockRejectedValue(new Error("Network error"))
 
     render(<App />)
 

@@ -1,12 +1,13 @@
 import pytest
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from main import app
 
 
 @pytest.mark.asyncio
 async def test_health_check():
     """Test health check endpoint returns ok."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/health")
         assert response.status_code == 200
         data = response.json()
@@ -18,7 +19,8 @@ async def test_health_check():
 @pytest.mark.asyncio
 async def test_get_config():
     """Test get config endpoint returns default config."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/config")
         assert response.status_code == 200
         data = response.json()
@@ -32,7 +34,8 @@ async def test_get_config():
 @pytest.mark.asyncio
 async def test_update_config():
     """Test update config endpoint persists changes."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         new_config = {
             "default_mode": "lite",
             "hide_status": True,
@@ -51,7 +54,8 @@ async def test_update_config():
 @pytest.mark.asyncio
 async def test_get_modes():
     """Test get modes endpoint returns all available modes."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/modes")
         assert response.status_code == 200
         data = response.json()

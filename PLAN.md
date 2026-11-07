@@ -10,7 +10,7 @@ core-skeleton
 
 ### core-skeleton — Core FastAPI/React skeleton with one end-to-end workflow
 
-Status: in_progress
+Status: done
 
 Acceptance:
 - FastAPI backend runs and serves API

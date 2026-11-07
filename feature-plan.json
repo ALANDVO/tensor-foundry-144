@@ -5,7 +5,7 @@
     {
       "id": "core-skeleton",
       "title": "Core FastAPI/React skeleton with one end-to-end workflow",
-      "status": "in_progress",
+      "status": "done",
       "acceptance": [
         "FastAPI backend runs and serves API",
         "React frontend builds and loads",
