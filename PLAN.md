@@ -72,3 +72,6 @@ Acceptance:
 - CI matrix for ubuntu-latest and windows-latest
 - Tests pass on both platforms
 
+---
+
+Alan Vo · [alanvo.net](https://alanvo.net)
