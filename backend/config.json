@@ -1,0 +1,7 @@
+{
+  "default_mode": "lite",
+  "hide_status": true,
+  "quiet_startup": false,
+  "map_enabled": true,
+  "map_chars": 1000
+}
