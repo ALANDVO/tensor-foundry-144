@@ -32,15 +32,19 @@
     {
       "id": "ponytail-config",
       "title": "Ponytail configuration system (modes, settings, persistence)",
-      "status": "planned",
+      "status": "in_progress",
       "acceptance": [
         "Configuration file read/write",
         "Mode switching (lite, standard, ultra, off)",
         "Environment variable overrides",
         "Settings persisted across sessions"
       ],
-      "implementation": [],
-      "tests": []
+      "implementation": [
+        "backend/main.py"
+      ],
+      "tests": [
+        "backend/tests/test_config.py"
+      ]
     },
     {
       "id": "hooks-system",

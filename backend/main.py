@@ -42,15 +42,36 @@ class HealthResponse(BaseModel):
 
 
 def load_config_from_file() -> ConfigModel:
-    """Load configuration from JSON file."""
-    if CONFIG_FILE.exists():
+    """Load configuration from JSON file.
+
+    Tolerant loading: each field is validated independently so that a single
+    invalid value does not discard the rest of the file. Invalid fields fall
+    back to their defaults, mirroring how an agent silently ignores a bad
+    config line rather than dropping every setting.
+    """
+    if not CONFIG_FILE.exists():
+        return ConfigModel()
+
+    try:
+        with open(CONFIG_FILE, "r") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return ConfigModel()
+
+    if not isinstance(data, dict):
+        return ConfigModel()
+
+    merged: dict = {}
+    for key, value in data.items():
+        if key not in ConfigModel.model_fields:
+            continue
         try:
-            with open(CONFIG_FILE, "r") as f:
-                data = json.load(f)
-                return ConfigModel(**data)
-        except (json.JSONDecodeError, OSError, ValueError):
-            pass
-    return ConfigModel()
+            ConfigModel.model_validate({key: value})
+            merged[key] = value
+        except (ValueError, TypeError):
+            # Drop only the offending field, keep the rest.
+            continue
+    return ConfigModel(**merged)
 
 
 def save_config_to_file(config: ConfigModel) -> None:
