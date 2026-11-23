@@ -114,3 +114,79 @@ async def test_mode_validation():
         # Invalid mode should be rejected
         response = await client.post("/api/config", json={"default_mode": "invalid"})
         assert response.status_code == 422  # Validation error
+
+
+@pytest.mark.asyncio
+async def test_partial_config_load_keeps_valid_fields():
+    """A single invalid field must not discard the other valid settings."""
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        json.dump(
+            {
+                "default_mode": "nonsense",   # invalid mode
+                "hide_status": True,          # valid, must survive
+                "quiet_startup": True,        # valid, must survive
+                "map_enabled": False,         # valid, must survive
+                "map_chars": 9999999,         # out of range, must be dropped
+            },
+            f,
+        )
+        temp_config_path = Path(f.name)
+
+    original_config_file = main.CONFIG_FILE
+    original_config_store = main.config_store
+    original_env = dict(os.environ)
+    # Ensure env vars do not mask the file defaults under test.
+    for var in list(os.environ):
+        if var.startswith("PONYTAIL_"):
+            del os.environ[var]
+
+    try:
+        main.CONFIG_FILE = temp_config_path
+        main.file_config = main.load_config_from_file()
+        main.env_settings = main.Settings()
+        main.config_store = main.merge_configs(main.file_config, main.env_settings)
+
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            response = await client.get("/api/config")
+            assert response.status_code == 200
+            data = response.json()
+            # Invalid fields fall back to defaults.
+            assert data["default_mode"] is None
+            assert data["map_chars"] == 2000
+            # Valid fields survive independently.
+            assert data["hide_status"] is True
+            assert data["quiet_startup"] is True
+            assert data["map_enabled"] is False
+    finally:
+        main.CONFIG_FILE = original_config_file
+        main.config_store = original_config_store
+        os.environ.clear()
+        os.environ.update(original_env)
+        if temp_config_path.exists():
+            temp_config_path.unlink()
+
+
+@pytest.mark.asyncio
+async def test_non_object_config_file_returns_defaults():
+    """A JSON file that is not an object is ignored without raising."""
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        f.write("[1, 2, 3]")
+        temp_config_path = Path(f.name)
+
+    original_config_file = main.CONFIG_FILE
+    original_env = dict(os.environ)
+    for var in list(os.environ):
+        if var.startswith("PONYTAIL_"):
+            del os.environ[var]
+
+    try:
+        main.CONFIG_FILE = temp_config_path
+        main.file_config = main.load_config_from_file()
+        assert main.file_config == main.ConfigModel()
+    finally:
+        main.CONFIG_FILE = original_config_file
+        os.environ.clear()
+        os.environ.update(original_env)
+        if temp_config_path.exists():
+            temp_config_path.unlink()

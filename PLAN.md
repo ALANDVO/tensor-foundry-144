@@ -25,13 +25,17 @@ Tests: `backend/tests/test_health.py`, `frontend/src/App.test.tsx`
 
 ### ponytail-config — Ponytail configuration system (modes, settings, persistence)
 
-Status: planned
+Status: in_progress
 
 Acceptance:
 - Configuration file read/write
 - Mode switching (lite, standard, ultra, off)
 - Environment variable overrides
 - Settings persisted across sessions
+
+Implementation: `backend/main.py`
+
+Tests: `backend/tests/test_config.py`
 
 ### hooks-system — Hooks system for AI agent integration
 
