@@ -4,6 +4,7 @@ Makes your AI agent think like the laziest senior dev in the room.
 """
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -162,6 +163,29 @@ async def get_modes():
             "ultra": "Maximum guidance - thorough analysis",
         },
     }
+
+
+# Mode-specific instruction text. Each mode returns a distinct, deterministic
+# block of guidance so callers (hooks, statusline) can inject the right level
+# of laziness without re-deriving it. "off" intentionally yields no guidance.
+MODE_INSTRUCTIONS = {
+    "off": "",
+    "lite": "Prefer the smallest change that solves the task. Do not add abstractions, config, or error handling for hypothetical futures.",
+    "standard": "Prefer the smallest change that solves the task. Reuse existing patterns. Delete code made obsolete by the change. Verify with a smoke run.",
+    "ultra": "Prefer the smallest change that solves the task. Reuse existing patterns and delete dead weight. State invariants, risks, and verification. Push back on risk-hidden plans with evidence before executing.",
+}
+
+
+@app.get("/api/instructions/{mode}")
+async def get_instructions(mode: str):
+    """Return the instruction text for a mode.
+
+    404 for unknown modes so callers fail loudly rather than silently
+    injecting nothing.
+    """
+    if mode not in MODE_INSTRUCTIONS:
+        return JSONResponse(status_code=404, content={"detail": f"Unknown mode: {mode}"})
+    return {"mode": mode, "instructions": MODE_INSTRUCTIONS[mode]}
 
 
 if __name__ == "__main__":
