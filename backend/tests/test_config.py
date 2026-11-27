@@ -190,3 +190,30 @@ async def test_non_object_config_file_returns_defaults():
         os.environ.update(original_env)
         if temp_config_path.exists():
             temp_config_path.unlink()
+
+
+@pytest.mark.asyncio
+async def test_instructions_per_mode():
+    """Each mode returns distinct instruction text; off is empty."""
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        seen = {}
+        for mode in ["off", "lite", "standard", "ultra"]:
+            response = await client.get(f"/api/instructions/{mode}")
+            assert response.status_code == 200
+            body = response.json()
+            assert body["mode"] == mode
+            seen[mode] = body["instructions"]
+        # off yields no guidance; the others are non-empty and distinct.
+        assert seen["off"] == ""
+        assert seen["lite"] and seen["standard"] and seen["ultra"]
+        assert len({seen["lite"], seen["standard"], seen["ultra"]}) == 3
+
+
+@pytest.mark.asyncio
+async def test_instructions_unknown_mode_is_404():
+    """Unknown modes fail loudly instead of injecting nothing."""
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/api/instructions/bogus")
+        assert response.status_code == 404
